@@ -22,7 +22,8 @@ This multifaceted tool empowers you to effortlessly create secure mnemonic seed 
     1. Manual Dice Roll: You have the option to roll physical dice or coin toss and input the data into the program as binary (1 or 0) or numbers (1 to 6). This method ensures true randomness in generating your mnemonic seed phrase.
     2. Automated Dice Roll: If you prefer a quicker approach, the program can generate random dice rolls for you. The automated dice roll function guarantees the randomness required for secure seed phrase generation.
 - **Mnemonic Seed Generation:** Once the dice roll data is collected, the program seamlessly proceeds to generate a valid checksum then generates a BIP39 mnemonic seed phrase. This seed phrase is the foundation for generating Bitcoin private keys and public addresses.
-- **Mnemonic Code Converter:** The mnemonic seed phrase is then passed through to the Mnemonic Code Converter within the same program. This converter is capable of generating BIP39 private keys and public addresses for all script types: Legacy (P2SH), Nested SegWit (P2SH-P2WSH), Native SegWit (P2WSH), and Taproot (P2TR).
+- **Mnemonic Code Converter:** The mnemonic seed phrase is then passed through to the Mnemonic Code Converter within the same program. This converter is capable of generating BIP39 private keys and public addresses for all script types: Legacy (P2PKH), Nested SegWit (P2SH-P2WPKH), Native SegWit (P2WPKH), and Taproot (P2TR).
+- **QR Code Generator:** A built in QR code generator from text.
 
 
 ## Prerequisites

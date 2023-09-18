@@ -9,19 +9,8 @@ index_width = 18
 
 def generate_seed_phrase(num_words):
     mnemo = Mnemonic("english")
-    seed_phrase = ' '.join(mnemo.generate(num_words=num_words))
+    seed_phrase = ' '.join(mnemo.generate(num_words))
     return seed_phrase
-
-# Function to check if a seed phrase is valid
-def is_valid_seed(seed_phrase):
-    mnemonic = Mnemonic("english")
-    words = seed_phrase.split()
-    
-    try:
-        entropy = mnemonic.to_entropy(seed_phrase)
-        return len(entropy) in [16, 32]  # Check if the entropy length is valid for 12 to 24 words
-    except ValueError:
-        return False
 
 def convert_wordlist_to_binary(wordlist):
     binary_wordlist = {}
@@ -31,36 +20,28 @@ def convert_wordlist_to_binary(wordlist):
     return binary_wordlist
 
 def word_to_binary(word, word_list):
-    try:
-        index = word_list.index(word)
-    except ValueError:
-        raise ValueError("Word not found in the word list")
-
+    index = word_list.index(word)
     binary_representation = bin(index)[2:].zfill(11)
     return binary_representation
 
 def roll_dice(n):
     return [int(random.randint(1, 6) % 2 == 0) for _ in range(n)] # odd numbers are 0, even numbers are 1
 #    return [int(random.randint(1, 6) > 3) for _ in range(n)] # You can enable this code to convert from (1, 2 or 3) to 0 and (4, 5 or 6) to 1
-
+       
 def roll_dice_auto(num_words):
     while True:
-        mnemonic = []
-
         mnemo = Mnemonic("english")
-        num_binary_digits = {
-            12: 7,
-            15: 6,
-            18: 5,
-            21: 4,
-            24: 3
-        }
+        word_list = mnemo.wordlist
+        binary_wordlist = convert_wordlist_to_binary(word_list)
 
+        num_binary_digits = {12: 7, 15: 6, 18: 5, 21: 4, 24: 3}
+        mnemonic = []
         print_list_blue = []  # Create a list to store messages for printing
         print_list = []  # Create a list to store messages for printing
-
+        valid_words_list = []
+        
         # Append the header row
-        header = f"{'           Word #':<{word_width}}{'Binary':<{binary_width}}{'Decimal':<{decimal_width}}{'Index':<{index_width}}"
+        header = f"{'           Word #':<{word_width}}{'Binary':<{binary_width}}{'Decimal':<{decimal_width}}{'Index & Word':<{index_width}}"
         print_list_blue.append(header)
         print_list_blue.append("           " + "-" * (word_width + binary_width + decimal_width + index_width - 10))
 
@@ -79,42 +60,46 @@ def roll_dice_auto(num_words):
             mnemonic.append(word)
 
         binary_digits = [roll_dice(1)[0] for _ in range(num_binary_digits[num_words])]
-        binary_str = ''.join(map(str, binary_digits))
-        row = f"           {num_words}{' ' * (word_width - 13)}{binary_str:<{binary_width}}"
+        last_word_binary = ''.join(map(str, binary_digits))
+        row = f"           {num_words}{' ' * (word_width - 13)}{last_word_binary:<{binary_width}}"
         print_list_blue.append(row)
-        print_list.append(f" Fetching valid checksum word...")
         print_list_blue.append("")
-
-        last_word_binary = binary_str
-        mnemo = Mnemonic("english")
-        word_list = mnemo.wordlist
-        binary_wordlist = convert_wordlist_to_binary(word_list)
+      
 
         matching_words = [word for binary_word, word in binary_wordlist.items() if binary_word.startswith(last_word_binary)]
+        print_list.append(f" Fetching words that start with last word binary input.")
+        print_list.append(f" Found {len(matching_words)} word(s) that start with last word binary input.")
+        print_list.append(f" Fetching if any of the {len(matching_words)} word(s) has a valid checksum.")
 
-        if matching_words:
-            random_matching_word = random.choice(matching_words)
-            random_matching_word_binary = word_to_binary(random_matching_word, word_list)
-            word_index = word_list.index(random_matching_word) 
-            binary = random_matching_word_binary
-            current_mnemonic = ' '.join(mnemonic[:]) + ' ' + random_matching_word
+        for word in matching_words:
+            temp_matching_word = word
+            temp_mnemonic = ' '.join(mnemonic[:]) + ' ' + temp_matching_word
+            if is_valid_seed(temp_mnemonic):
+                valid_words_list.append(temp_matching_word)
 
-        # Append the header row
-        header = f"{'           Word #':<{word_width}}{'Binary':<{binary_width}}{'Decimal':<{decimal_width}}{'Index':<{index_width}}"
-        print_list_blue.append(header)
-        print_list_blue.append("           " + "-" * (word_width + binary_width + decimal_width + index_width - 10))
+        valid_word_count = len(valid_words_list)
 
+        print_list.append(f" Found {valid_word_count} word(s) with valid checksum, choosing a word to proceed.")
+
+        for word in valid_words_list:
+            valid_word = word
+            current_mnemonic = ' '.join(mnemonic[:]) + ' ' + valid_word
+                    
         if is_valid_seed(current_mnemonic):
-            mnemonic.append(random_matching_word)
-            decimal = word_index 
+            mnemonic.append(valid_word)
+            binary = word_to_binary(valid_word, word_list)
+            decimal = word_list.index(valid_word) 
             decimal_formatted = f"{decimal:04d}"
-            index_num = str(word_index+1).zfill(4)
-            index = f"{index_num} - {random_matching_word}"
+            index_num = str(decimal+1).zfill(4)
+            index = f"{index_num} - {valid_word}"
+            header = f"{'           Word #':<{word_width}}{'Binary':<{binary_width}}{'Decimal':<{decimal_width}}{'Index & Word':<{index_width}}"
+            print_list_blue.append(header)
+            print_list_blue.append("           " + "-" * (word_width + binary_width + decimal_width + index_width - 10))
             row = f"           {num_words:02}{' ' * (word_width - 13)}{binary:<{binary_width}}{decimal_formatted:<{decimal_width}}{index:<{index_width}}"
             print_list_blue.append(row)
 
             bit_checksum = 11 - num_binary_digits[num_words]
-            mnemonic_bits = (int(num_words)-1) * 11 + (11 - bit_checksum)           
+            mnemonic_bits = (int(num_words)-1) * 11 + (11 - bit_checksum)       
             total_bits = (int(num_words)) * 11
             print()
             print_red(f" You've chosen to generate a {num_words}-word mnemonic seed phrase."
@@ -131,35 +116,32 @@ def roll_dice_auto(num_words):
                 print_blue(msg)
             return mnemonic
 
-def roll_dice_manual_binary(num_words):
-    mnemonic = []
 
-    num_binary_digits = {
-        12: 7,
-        15: 6,
-        18: 5,
-        21: 4,
-        24: 3
-    }
-
+    
+def roll_dice_manual_binary(num_words):   
     mnemo = Mnemonic("english")
+    word_list = mnemo.wordlist
+    binary_wordlist = convert_wordlist_to_binary(word_list)
 
+    num_binary_digits = {12: 7, 15: 6, 18: 5, 21: 4, 24: 3}
+    mnemonic = []
     print_list_blue = []  # Create a list to store messages for printing
     print_list = []  # Create a list to store messages for printing
     input_binary_list = []  # Store binary representations of words
-    input_words_list = []  # Store words
+    valid_words_list = []
 
     bit_checksum = 11 - num_binary_digits[num_words]
     last_word_bit = 11 - bit_checksum           
     mnemonic_bits = (int(num_words)-1) * 11 + (11 - bit_checksum)           
     total_bits = (int(num_words)) * 11
     print()
-    print_red(f" You've chosen to generate a {num_words}-word mnemonic seed phrase.")
-    print_red(f" To create a {num_words}-word mnemonic, you need to randomly roll {mnemonic_bits} bits.")
-    print_red(f" The script will calculate the last {bit_checksum} bits for checksum, totaling {total_bits} bits.")
-    print_red(f" Roll the 6-sided dice{mnemonic_bits} times, record odd numbers (1, 3, 5) as 0 and even numbers (2, 4, 6) as 1.")
-    print_red(f" Furthermore, you have the option to conduct {mnemonic_bits} coin tosses, assigning either 0 or 1 to each side and record the results.")
-    print_red(f" For each word, input 11 binary numbers, for the last word, enter {last_word_bit} binary numbers.")
+    print_red(f" You've chosen to generate a {num_words}-word mnemonic seed phrase."
+              f"\n To create a {num_words}-word mnemonic, you need {total_bits} bits of entropy."
+              f"\n You need {mnemonic_bits} random dice rolls or coin tosses."
+              f"\n The script will calculate the last {bit_checksum} bits for a valid checksum, totaling {total_bits} bits."
+              f"\n Roll the 6-sided dice {mnemonic_bits} times, record odd numbers (1, 3, 5) as 0 and even numbers (2, 4, 6) as 1."
+              f"\n Furthermore, you can conduct {mnemonic_bits} coin tosses, assigning either 0 or 1 to each side and record the results."
+              f"\n For each word, input 11 binary numbers, for the last word, enter {last_word_bit} binary numbers.")
     print()
 
     for i in range(1, num_words):
@@ -173,7 +155,6 @@ def roll_dice_manual_binary(num_words):
                 print(" Invalid input. Please enter 11 binary numbers (0 or 1) within the brackets.")
                 
         decimal_value = int(binary_str, 2) + 1
-        word = mnemo.wordlist[decimal_value - 1]
 
     while True:
         spaces = ' ' * num_binary_digits[num_words]
@@ -189,21 +170,20 @@ def roll_dice_manual_binary(num_words):
     print()
     print()
 
-
     # Append the header row
-    header = f"{'           Word #':<{word_width}}{'Binary':<{binary_width}}{'Decimal':<{decimal_width}}{'Index':<{index_width}}"
+    header = f"{'           Word #':<{word_width}}{'Binary':<{binary_width}}{'Decimal':<{decimal_width}}{'Index & Word':<{index_width}}"
     print_list_blue.append(header)
     print_list_blue.append("           " + "-" * (word_width + binary_width + decimal_width + index_width - 10))
 
     # Print each row with corresponding decimal, index, and word
-    for i, binary_word in enumerate(input_binary_list, start=1):
-        decimal_value = int(binary_word, 2) + 1
-        word = mnemo.wordlist[decimal_value - 1]
-        binary = binary_word
-        decimal = decimal_value - 1
+    for i, binary in enumerate(input_binary_list, start=1):
+        binary = binary
+        decimal = int(binary, 2)
         decimal_formatted = f"{decimal:04d}"
         index_num = str(decimal_value).zfill(4)
+        word = mnemo.wordlist[decimal]
         index = f"{index_num} - {word}"
+
         if i == len(input_binary_list):
             row = f"           {i:02d}{' ' * (word_width - 13)}{binary:<{binary_width}}"
             print_list_blue.append(row)
@@ -212,33 +192,37 @@ def roll_dice_manual_binary(num_words):
             print_list_blue.append(row)
             mnemonic.append(word)
 
-    print_list.append("")
-    print_list.append(f" Fetching valid checksum word...")
-    # Append the header row
-    header = f"{'           Word #':<{word_width}}{'Binary':<{binary_width}}{'Decimal':<{decimal_width}}{'Index':<{index_width}}"
-    print_list_blue.append(header)
-    print_list_blue.append("           " + "-" * (word_width + binary_width + decimal_width + index_width - 10))
-
     while True:
-        mnemo = Mnemonic("english")
-        word_list = mnemo.wordlist
-        binary_wordlist = convert_wordlist_to_binary(word_list)
-
         matching_words = [word for binary_word, word in binary_wordlist.items() if binary_word.startswith(last_word_binary)]
+        print_list.append("")
+        print_list.append(f" Fetching words that start with last word binary input.")
+        print_list.append(f" Found {len(matching_words)} word(s) that start with last word binary input.")
+        print_list.append(f" Fetching if any of the {len(matching_words)} word(s) has a valid checksum.")
 
-        if matching_words:
-            random_matching_word = random.choice(matching_words)
-            random_matching_word_binary = word_to_binary(random_matching_word, word_list)
-            word_index = word_list.index(random_matching_word)
-            current_mnemonic = ' '.join(mnemonic[:]) + ' ' + random_matching_word
+        for word in matching_words:
+            temp_matching_word = word
+            temp_mnemonic = ' '.join(mnemonic[:]) + ' ' + temp_matching_word
+            if is_valid_seed(temp_mnemonic):
+                valid_words_list.append(temp_matching_word)
+
+        valid_word_count = len(valid_words_list)
+
+        print_list.append(f" Found {valid_word_count} word(s) with valid checksum, choosing a word to proceed.")
+
+        for word in valid_words_list:
+            valid_word = word
+            current_mnemonic = ' '.join(mnemonic[:]) + ' ' + valid_word
 
         if is_valid_seed(current_mnemonic):
-            mnemonic.append(random_matching_word)
-            binary = random_matching_word_binary
-            decimal = word_index 
+            mnemonic.append(valid_word)
+            binary = word_to_binary(valid_word, word_list)
+            decimal = word_list.index(valid_word) 
             decimal_formatted = f"{decimal:04d}"
-            index_num = str(word_index+1).zfill(4)
-            index = f"{index_num} - {random_matching_word}"
+            index_num = str(decimal+1).zfill(4)
+            index = f"{index_num} - {valid_word}"
+            header = f"{'           Word #':<{word_width}}{'Binary':<{binary_width}}{'Decimal':<{decimal_width}}{'Index & Word':<{index_width}}"
+            print_list_blue.append(header)
+            print_list_blue.append("           " + "-" * (word_width + binary_width + decimal_width + index_width - 10))
             row = f"           {num_words}{' ' * (word_width - 13)}{binary:<{binary_width}}{decimal_formatted:<{decimal_width}}{index:<{index_width}}"
             print_list_blue.append(row)
             for msg in print_list_blue[:-3]:
@@ -251,32 +235,27 @@ def roll_dice_manual_binary(num_words):
             return mnemonic
 
 def roll_dice_manual_num(num_words):
-    mnemonic = []
-
-    num_binary_digits = {
-        12: 7,
-        15: 6,
-        18: 5,
-        21: 4,
-        24: 3
-    }
-
     mnemo = Mnemonic("english")
+    word_list = mnemo.wordlist
+    binary_wordlist = convert_wordlist_to_binary(word_list)
 
+    num_binary_digits = {12: 7, 15: 6, 18: 5, 21: 4, 24: 3}
+    mnemonic = []
     print_list_blue = []  # Create a list to store messages for printing
     print_list = []  # Create a list to store messages for printing
     input_digit_list = []  # Store digits
     input_binary_list = []  # Store binary representations of words
-    input_words_list = []  # Store words
+    valid_words_list = []
 
     bit_checksum = 11 - num_binary_digits[num_words]
     last_word_bit = 11 - bit_checksum           
     mnemonic_bits = (int(num_words) - 1) * 11 + (11 - bit_checksum)           
     total_bits = int(num_words) * 11
     print()
-    print_red(f" You've chosen to generate a {num_words}-word mnemonic seed phrase."
-              f"\n For {num_words}-word mnemonics, roll {mnemonic_bits} bits randomly."
-              f"\n The script will calculate the last {bit_checksum} bits for checksum, totaling {total_bits} bits."
+    print_red(f"\n You've chosen to generate a {num_words}-word mnemonic seed phrase."
+              f"\n To create a {num_words}-word mnemonic, you need {total_bits} bits of entropy."
+              f"\n You need {mnemonic_bits} random dice rolls or coin tosses."
+              f"\n The script will calculate the last {bit_checksum} bits for a valid checksum, totaling {total_bits} bits."
               f"\n The script will automatically convert odd numbers (1, 3, or 5) to 0 and even numbers (2, 4, or 6) to 1 during the process."
               f"\n Each word requires 11 binary numbers (1 to 6); for the last word, input only {last_word_bit} numbers.")
     print()
@@ -292,9 +271,6 @@ def roll_dice_manual_num(num_words):
                 break
             else:
                 print(" Invalid input. Please enter 11  digits containing only '1,2,3,4,5 or 6' within the brackets.")
-
-        decimal_value = int(binary_str, 2) + 1
-        word = mnemo.wordlist[decimal_value - 1]
 
     while True:
         spaces = ' ' * num_binary_digits[num_words]
@@ -314,19 +290,18 @@ def roll_dice_manual_num(num_words):
     print()
 
     # Append the header row
-    header = f"{'           Word #':<{word_width}}{'Dice':<{dice_width}}{'Binary':<{binary_width}}{'Decimal':<{decimal_width}}{'Index':<{index_width}}"
+    header = f"{'           Word #':<{word_width}}{'Dice':<{dice_width}}{'Binary':<{binary_width}}{'Decimal':<{decimal_width}}{'Index & Word':<{index_width}}"
     print_list_blue.append(header)
     print_list_blue.append("           " + "-" * (word_width + dice_width + binary_width + decimal_width + index_width - 10))
 
-    # Print each row with corresponding decimal, index, and word
-    for i, binary_word in enumerate(input_binary_list, start=1):
-        decimal_value = int(binary_word, 2) + 1
-        word = mnemo.wordlist[decimal_value - 1]
+    # Print each row with corresponding dice, decimal, index, and word
+    for i, binary in enumerate(input_binary_list, start=1):
         dice = input_digit_list[i - 1]  # Get the corresponding digit from input_digit_list
-        binary = binary_word
-        decimal = decimal_value - 1
+        binary = binary
+        decimal = int(binary, 2)
         decimal_formatted = f"{decimal:04d}"
-        index_num = str(decimal_value).zfill(4)
+        word = mnemo.wordlist[decimal]
+        index_num = str(decimal+1).zfill(4)
         index = f"{index_num} - {word}"
         if i == len(input_binary_list):
             row = f"           {i:02d}{' ' * (word_width - 13)}{dice:<{dice_width}}{binary:<{binary_width}}"
@@ -336,34 +311,38 @@ def roll_dice_manual_num(num_words):
             print_list_blue.append(row)
             mnemonic.append(word)
 
-    print_list.append("")
-    print_list.append(f" Fetching valid checksum word...")
-
-    # Append the header row
-    header = f"{'           Word #':<{word_width}}{'Dice':<{dice_width}}{'Binary':<{binary_width}}{'Decimal':<{decimal_width}}{'Index':<{index_width}}"
-    print_list_blue.append(header)
-    print_list_blue.append("           " + "-" * (word_width + dice_width + binary_width + decimal_width + index_width - 10))
-
     while True:
-        mnemo = Mnemonic("english")
-        word_list = mnemo.wordlist
-        binary_wordlist = convert_wordlist_to_binary(word_list)
         matching_words = [word for binary_word, word in binary_wordlist.items() if binary_word.startswith(last_word_binary)]
+        print_list.append("")
+        print_list.append(f" Fetching words that start with last word binary input.")
+        print_list.append(f" Found {len(matching_words)} word(s) that start with last word binary input.")
+        print_list.append(f" Fetching if any of the {len(matching_words)} word(s) has a valid checksum.")
 
-        if matching_words:
-            random_matching_word = random.choice(matching_words)
-            random_matching_word_binary = word_to_binary(random_matching_word, word_list)
-            word_index = word_list.index(random_matching_word)
-            current_mnemonic = ' '.join(mnemonic[:]) + ' ' + random_matching_word
+        for word in matching_words:
+            temp_matching_word = word
+            temp_mnemonic = ' '.join(mnemonic[:]) + ' ' + temp_matching_word
+            if is_valid_seed(temp_mnemonic):
+                valid_words_list.append(temp_matching_word)
+
+        valid_word_count = len(valid_words_list)
+
+        print_list.append(f" Found {valid_word_count} word(s) with valid checksum, choosing a word to proceed.")
+
+        for word in valid_words_list:
+            valid_word = word
+            current_mnemonic = ' '.join(mnemonic[:]) + ' ' + valid_word
 
         if is_valid_seed(current_mnemonic):
-            mnemonic.append(random_matching_word)
+            mnemonic.append(valid_word)
             dice = "-"
-            binary = random_matching_word_binary
-            decimal = word_index 
+            binary = word_to_binary(valid_word, word_list)
+            decimal = word_list.index(valid_word) 
             decimal_formatted = f"{decimal:04d}"
-            index_num = str(word_index+1).zfill(4)
-            index = f"{index_num} - {random_matching_word}"
+            index_num = str(decimal+1).zfill(4)
+            index = f"{index_num} - {valid_word}"
+            header = f"{'           Word #':<{word_width}}{'Dice':<{dice_width}}{'Binary':<{binary_width}}{'Decimal':<{decimal_width}}{'Index & Word':<{index_width}}"
+            print_list_blue.append(header)
+            print_list_blue.append("           " + "-" * (word_width + dice_width + binary_width + decimal_width + index_width - 10))
             row = f"           {i:02d}{' ' * (word_width - 13)}{dice:<{dice_width}}{binary:<{binary_width}}{decimal_formatted:<{decimal_width}}{index:<{index_width}}"
             print_list_blue.append(row)
             for msg in print_list_blue[:-3]:
