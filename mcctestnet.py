@@ -178,7 +178,7 @@ def print_address_details(script_type, addresses):
         print_cyan(f"         " + "-" * line_width)
 
         for index, (BIP, address, wif) in enumerate(addresses[f'{script_type}C']):
-            path = f" m/{BIP}'/1'/0'/0/{index}".ljust(20)
+            path = f" m/{BIP}'/1'/0'/1/{index}".ljust(20)
             address = address.ljust(address_width)
             print(f"        {path} {address} {wif}")
 

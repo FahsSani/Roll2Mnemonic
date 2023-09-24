@@ -38,20 +38,20 @@ def foot_note():
         " Please note that binary numbers start from 0, while the BIP39 wordlist starts from 1, so remember to add 1 to the decimal result to match the word.")
 
 def enable_buttons():
-    generate_manual_button.config(state="normal")  # Disable the button to prevent any errors
-    generate_random_button.config(state="normal")  # Disable the button to prevent any errors
-    continue_button.config(state="normal")  # Disable the button to prevent any errors
+    generate_manual_button.config(state="normal") 
+    generate_random_button.config(state="normal") 
+    continue_button.config(state="normal")  
     result_label.config(text="")
 
 def disable_buttons():
-    generate_random_button.config(state="disabled")  # Enable the button after generating
-    generate_manual_button.config(state="disabled")  # Enable the button after generating
-    continue_button.config(state="disabled")  # Enable the button after generating
+    generate_random_button.config(state="disabled")  
+    generate_manual_button.config(state="disabled") 
+    continue_button.config(state="disabled") 
     result_label.config(text="The 'Generate' buttons are temporarily disabled to prevent potential errors.\n Functionality will be reactivated once you've completed entering the numbers.")
 
 # Function to generate QR code
 def generate_qr_code():
-    text = qr_text_entry.get("1.0", "end-1c")  # Get all text from the Text widget
+    text = qr_text_entry.get("1.0", "end-1c") 
     if text:
         qr = qrcode.QRCode(
             version=1,
@@ -62,7 +62,7 @@ def generate_qr_code():
         qr.add_data(text)
         qr.make(fit=True)
         qr_img = qr.make_image(fill_color="black", back_color="white")
-        qr_img = qr_img.resize((250, 250))  # Resize the image if needed
+        qr_img = qr_img.resize((270, 270))  # Resize the image if needed
 
         # Convert the PIL image to a PhotoImage object
         qr_photo = ImageTk.PhotoImage(qr_img)
@@ -96,7 +96,7 @@ def main():
     github_info = f"GitHub              : https://github.com/FahsSani"
     lightning_info = f"Lightning Donations : sani@walletofsatoshi.com"
     max_info_length = max(len(creator_info), len(twitter_info), len(github_info), len(lightning_info))
-    box_width = max_info_length + 4  # Adjust the box width based on the max info length
+    box_width = max_info_length + 4  
     info_box = " " + "+" + "-" * (box_width - 2) + "+"
     info_box += f"\n | {creator_info.ljust(max_info_length)} |"
     info_box += f"\n | {twitter_info.ljust(max_info_length)} |"
@@ -107,18 +107,18 @@ def main():
 
 def generate_random_dice_numbers():
     main()
-    global seed_phrase  # Use the global seed_phrase variable
+    global seed_phrase 
     num_words = int(num_words_var.get())
     mnemonic_seed = roll_dice_auto(num_words)
     seed_phrase = ' '.join(mnemonic_seed)
     print_green(f"\n Mnemonic Seed Phrase: {seed_phrase}\n")
     foot_note()
-    continue_button.config(state="normal")  # Enable the button after generating
+    continue_button.config(state="normal") 
     result_label.config(text="")
     
 def generate_manual_dice_numbers():
     main()
-    global seed_phrase  # Use the global seed_phrase variable
+    global seed_phrase  
     num_words = int(num_words_var.get())
 
     choice = dice_choice_var.get()
@@ -140,18 +140,17 @@ def generate_manual_dice_numbers():
         result_label.config(text="")
 
 def mnemonic_converter():
-    global seed_phrase  # Use the global seed_phrase variable
+    global seed_phrase
     passphrase = passphrase_entry.get().strip()
 
     try:
         num_child_keys = int(child_keys_entry.get())
         if 1 <= num_child_keys <= 25:
-            network_type = network_type_var.get()  # Get the selected network type
+            network_type = network_type_var.get() 
             if network_type == "Mainnet":
                 generate_mainnet_wallet(seed_phrase, num_child_keys, passphrase)
             elif network_type == "Testnet":
                 generate_testnet_wallet(seed_phrase, num_child_keys, passphrase)
-            # subprocess.Popen(['python', 'qrgen.py'])
         else:
             result_label.config(text="Invalid number of child keys. Must be between 1 and 25.")
     except ValueError:
@@ -162,7 +161,7 @@ disclaimer()
 # Create the main window
 root = tk.Tk()
 root.title("Roll2Mnemonic")
-root.geometry("455x530")  # Set the width and height of the window
+root.geometry("455x530") 
 
 # Create tabs
 notebook = ttk.Notebook(root)
@@ -170,7 +169,7 @@ notebook.pack(fill='both', expand='yes')
 
 # Create tab 1: Dice Roll
 tab1 = tk.Frame(notebook)
-notebook.add(tab1, text="Dice Roll & Mnemonic Seed Phrase")
+notebook.add(tab1, text="Dice Roll & Mnemonic Code Converter")
 
 frame1 = tk.LabelFrame(tab1, text="Mnemonic Seed Phrase Word Count", labelanchor="n")
 frame1.grid(row=0, column=0, columnspan=5, padx=10, pady=10)
@@ -205,21 +204,17 @@ frame3.grid(row=4, column=0, columnspan=10, padx=10, pady=10)
 
 passphrase_entry = tk.Entry(frame3)
 passphrase_entry.grid(row=0, column=1)
-
-# Set a larger width for the passphrase_entry
-passphrase_entry.config(width=40)  # You can adjust the width as needed
+passphrase_entry.config(width=40)  
 
 frame4 = tk.LabelFrame(tab1, text="Number of Child Keys (1-25)", padx=10, pady=10, labelanchor="n")
 frame4.grid(row=5, column=0, columnspan=10, padx=10, pady=10)
-
 child_keys_entry = tk.Entry(frame4, justify="center")
-child_keys_entry.insert(0, "5")  # Default value
+child_keys_entry.insert(0, "5") 
 child_keys_entry.grid(row=0, column=1)
-child_keys_entry.config(width=25)  # You can adjust the width as needed
+child_keys_entry.config(width=25) 
 
 frame5 = tk.LabelFrame(tab1, text="Choose Network Type", padx=10, pady=0, labelanchor="n")
 frame5.grid(row=6, column=0, columnspan=2, padx=10, pady=10)
-
 network_type_var = tk.StringVar()
 network_type_var.set("Mainnet")
 network_type_mainnet = tk.Radiobutton(frame5, text="Mainnet", variable=network_type_var, value="Mainnet")
@@ -230,36 +225,30 @@ network_type_testnet.grid(row=0, column=1, padx=5, pady=1)
 continue_button = tk.Button(tab1, text="Mnemonic Code Converter", command=mnemonic_converter)
 continue_button.grid(row=7, column=0, columnspan=2, padx=10, pady=10)
 
-result_label = tk.Label(tab1, text="", padx=10, pady=20)
+result_label = tk.Label(tab1, text="", padx=10, pady=20, fg="red")
 result_label.grid(row=8, column=0, columnspan=2)
 
-# Create tab 3: QR Code Generator
-tab3 = tk.Frame(notebook)
-notebook.add(tab3, text="QR Code Generator")
+# Create tab 2: QR Code Generator
+tab2 = tk.Frame(notebook)
+notebook.add(tab2, text="QR Code Generator")
 
-# QR Code Generator UI elements
-qr_label = tk.Label(tab3, text="Enter the intended text then click Generate QR Code:")
-qr_label.grid(row=0, column=0, padx=10, pady=7)
+qr_label = tk.LabelFrame(tab2, text="Enter the intended text then click Generate QR Code", padx=10, pady=0, labelanchor="n")
+qr_label.grid(row=0, column=0, columnspan=12, padx=10, pady=5)
+qr_text_entry = tk.Text(qr_label, height=5, width=65, font=("Helvetica", 8))
+qr_text_entry.grid(row=1, column=0, columnspan=12, padx=3, pady=5)
 
-qr_text_entry = tk.Text(tab3, height=5, width=45) 
-qr_text_entry.grid(row=1, column=0, padx=10, pady=1)
-
-qr_warning_label = tk.Label(tab3, text=f"Make sure to copy the intended text correctly."
-                            "\nMake sure not to add spaces after your text, this will affect the resulting QR Code."
-                            "\nMistakes may lead to serious losses."
+qr_warning_label = tk.Label(tab2, text=f"Make sure to copy the intended text correctly."
+                            "\nWatch for unnecessary spaces, mistakes may lead to serious losses."
                             "\nFor added privacy, QR code and text will be cleared after 1 minute of generation.", fg="red")
-qr_warning_label.grid(row=2, column=0, padx=10, pady=0)
+qr_warning_label.grid(row=2, column=0, columnspan=11, padx=10, pady=0)
 
+generate_qr_button = tk.Button(tab2, text="Generate QR Code", command=generate_qr_code)
+generate_qr_button.grid(row=6, column=0, columnspan=11, padx=10, pady=10)
 
-generate_qr_button = tk.Button(tab3, text="Generate QR Code", command=generate_qr_code)
-generate_qr_button.grid(row=6, column=0, padx=10, pady=10)
+qr_code_label = tk.Label(tab2)
+qr_code_label.grid(row=7, column=0, columnspan=11)
 
-# Display the QR code here
-qr_code_label = tk.Label(tab3)
-qr_code_label.grid(row=7, column=0)
-
-# Start the GUI event loop
 continue_button.config(state="disabled")
-result_label.config(text=f"The 'Mnemonic Code Converter' button is temporarily disabled. \nGenerate dice number to enable.")
+result_label.config(text=f"The 'Mnemonic Code Converter' button is temporarily disabled. \nGenerate dice numbers to enable.")
 
 root.mainloop()
