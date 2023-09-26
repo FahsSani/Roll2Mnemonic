@@ -151,10 +151,10 @@ def print_address_details(script_type, addresses):
         print_green(f"     Acc. Ext. Pub. Key: {extpubkey2}")
 
     format_info = {
-        "Legacy (P2PKH)": (39, 112),
-        "Nested SegWit (P2SH-P2WPKH)": (39, 112),
-        "Native SegWit (P2WPKH)": (47, 120),
-        "Taproot (P2TR)": (67, 140)
+        "Legacy (P2PKH)": (38, 111),
+        "Nested SegWit (P2SH-P2WPKH)": (38, 111),
+        "Native SegWit (P2WPKH)": (46, 119),
+        "Taproot (P2TR)": (66, 139)
     }
 
     if script_type in format_info:
