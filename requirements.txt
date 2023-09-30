@@ -6,3 +6,4 @@ bitcoinaddress==0.1.5
 bitcoin-utils==0.6.3
 art>=6.0
 qrcode[pil]>=7.4.2
+keyboard>=0.13.5

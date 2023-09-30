@@ -2,9 +2,10 @@ import random
 from mnemonic import Mnemonic
 import platform
 import subprocess
+import keyboard
 import os
+import locale
 import datetime
-from mnemonic import Mnemonic
 from bip32utils import BIP32Key
 import hashlib
 import binascii
@@ -15,13 +16,17 @@ from bitcoinaddress import segwit_addr
 from bitcoinaddress.key.key import Key
 from bitcoinaddress.address import Address
 from bitcoinutils.setup import setup
-from bitcoinutils.keys import P2pkhAddress, PrivateKey
+from bitcoinutils.keys import P2pkhAddress, PrivateKey, PublicKey
 from art import *
 import tkinter as tk
 from tkinter import ttk
 import qrcode
 from PIL import Image, ImageTk
-   
+
+
+# Set the locale to your preferred formatting (e.g., en_US.UTF-8)
+locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
+
 # Functions to print text in color
 def print_red(*args):
     text = ' '.join(map(str, args))
@@ -65,6 +70,27 @@ def print_centered_art_text(text, convert, fonttype):
     # Print centered text
     tprint(centered_text, font=fonttype)
 
+def maximize_window():
+    system = platform.system()
+    
+    if system == 'Windows':
+        # Windows: Send Win + Up Arrow
+        keyboard.press_and_release('win+up')
+    elif system == 'Darwin':
+        # macOS: Send Ctrl + Command + F
+        keyboard.press_and_release('ctrl+cmd+f')
+    elif system == 'Linux':
+        try:
+            # Linux: Send Alt + F10 (using wmctrl if available)
+            subprocess.check_output(['wmctrl', '--version'])
+            subprocess.run(['wmctrl', '-r', ':ACTIVE:', '-b', 'add,maximized_vert,maximized_horz'])
+        except subprocess.CalledProcessError:
+            # If wmctrl is not available, send Alt + F10 using keyboard
+            keyboard.press_and_release('alt+f10')
+    else:
+        print(f"Unsupported operating system: {system}")
+
+   
 # Function to check if a seed phrase is valid
 def is_valid_seed(seed_phrase):
     try:

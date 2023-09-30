@@ -14,15 +14,20 @@ Table Of Contents
 
 # Roll2Mnemonic
 
-This multifaceted tool empowers you to effortlessly create secure mnemonic seed phrases using either manual dice rolls or coin tosses. It then goes a step further by generating corresponding private keys and public addresses for all available Bitcoin script types. Whether you prefer manual or automated methods, this tool has you covered.
+This multifaceted tool empowers you to effortlessly create secure mnemonic seed phrases using either manual dice rolls, coin tosses or seed phrases. It then goes a step further by generating corresponding private keys and public addresses for all available Bitcoin script types. Whether you prefer manual or automated methods, this tool has you covered.
 
 ## Features
 
-- **Dice Roll:**
-    1. Manual Dice Roll: You have the option to roll physical dice or coin toss and input the data into the program as binary (1 or 0) or numbers (1 to 6). This method ensures true randomness in generating your mnemonic seed phrase.
-    2. Automated Dice Roll: If you prefer a quicker approach, the program can generate random dice rolls for you. The automated dice roll function guarantees the randomness required for secure seed phrase generation.
-- **Mnemonic Seed Generation:** Once the dice roll data is collected, the program seamlessly proceeds to generate a valid checksum then generates a BIP39 mnemonic seed phrase. This seed phrase is the foundation for generating Bitcoin private keys and public addresses.
-- **Mnemonic Code Converter:** The mnemonic seed phrase is then passed through to the Mnemonic Code Converter within the same program. This converter is capable of generating BIP39 private keys and public addresses for all script types: Legacy (P2PKH), Nested SegWit (P2SH-P2WPKH), Native SegWit (P2WPKH), and Taproot (P2TR).
+- **Dice Roll To Mnemonic:**
+    1. Physical Dice or Coin Toss: You have the flexibility to roll physical dice or conduct a coin toss and input the resulting data as either binary (1 or 0) or numbers (1 to 6). This method ensures absolute randomness for generating your mnemonic seed phrase.
+    2. Dice Roll From Entropy: For a quicker approach, the program can generate random dice rolls for you. The automated dice roll function guarantees the essential randomness needed for a secure seed phrase.
+    3. Mnemonic Seed Generation: After collecting the dice roll data, the program seamlessly proceeds to generate a valid checksum and creates a BIP39 mnemonic seed phrase. This seed phrase forms the cornerstone for generating Bitcoin private keys and public addresses.
+    4. Mnemonic Code Converter: The generated mnemonic seed phrase is then processed through the Mnemonic Code Converter, capable of generating BIP39 private keys and public addresses for all script types: Legacy (P2PKH), Nested SegWit (P2SH-P2WPKH), Native SegWit (P2WPKH), and Taproot (P2TR).
+- **Seed To Mnemonic:**
+    1. Generate Hex Seed From Entropy: The program can generate a Hex seed from entropy. The automated function guarantees the essential randomness required for secure seed generation.
+    2. Mnemonic Seed Generation: After collecting the Hex seed, the program seamlessly proceeds to generate a valid checksum and creates a BIP39 mnemonic seed phrase.
+    3. Own Mnemonic Seed Phrase: You have the option to enter your own mnemonic seed phrase into the program.
+    4. Mnemonic Code Converter: The generated mnemonic seed phrase is then processed through the Mnemonic Code Converter, capable of generating BIP39 private keys and public addresses for all script types: Legacy (P2PKH), Nested SegWit (P2SH-P2WPKH), Native SegWit (P2WPKH), and Taproot (P2TR).
 - **QR Code Generator:** A built in QR code generator from text.
 
 
@@ -82,7 +87,7 @@ https://www.python.org/downloads/
 https://pip.pypa.io/en/stable/installation/
 ```
 
-3. Clone or download the repository and extract it.
+3. Clone or download the repository (Make sure you have the latest release), and extract it.
 
 4. Cloning dependencies, same method for all operating systems:
 
@@ -139,7 +144,7 @@ Now your offline device should have all the required dependencies to run offline
 
 ## Demo Video
 
-  [![Video](http://img.youtube.com/vi/TV6SB6fHE-s/0.jpg)](http://www.youtube.com/watch?v=TV6SB6fHE-s)
+  [![Video](http://img.youtube.com/vi/zpM8gb1_vQQ/0.jpg)](https://www.youtube.com/watch?v=zpM8gb1_vQQ)
 
 ## Support and Feedback
 

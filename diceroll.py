@@ -24,10 +24,17 @@ def word_to_binary(word, word_list):
     binary_representation = bin(index)[2:].zfill(11)
     return binary_representation
 
+import random
+
 def roll_dice(n):
-    return [int(random.randint(1, 6) % 2 == 0) for _ in range(n)] # odd numbers are 0, even numbers are 1
-#    return [int(random.randint(1, 6) > 3) for _ in range(n)] # You can enable this code to convert from (1, 2 or 3) to 0 and (4, 5 or 6) to 1
-       
+    auto_dice_list = []
+    for i in range(10000):
+        auto_dice = [int(random.randint(1, 1000)) for _ in range(n)] 
+        auto_dice_list.append(auto_dice)
+    auto_dice = random.choice(auto_dice_list)
+    auto_dice_binary = [1 if num % 2 == 0 else 0 for num in auto_dice]  # odd numbers are converted 0, even numbers are converted 1  
+    return auto_dice_binary
+
 def roll_dice_auto(num_words):
     while True:
         mnemo = Mnemonic("english")
@@ -104,7 +111,8 @@ def roll_dice_auto(num_words):
             print()
             print_red(f" You've chosen to generate a {num_words}-word mnemonic seed phrase."
                       f"\n This requires rolling {mnemonic_bits} bits randomly and calculating {bit_checksum} bits for a valid checksum, totaling {total_bits} bits."
-                      f"\n The dice will be rolled {mnemonic_bits} times.")
+                      f"\n For each bit in the {mnemonic_bits} bits, a 1,000-sided dice will be roll 10,000 times and the results will be stored in a list."
+                      f"\n Subsequently, a random number will be selected from the list and transformed into 0 if it's odd or 1 if it's even.")
             print()
             # Print the appended messages if the seed is valid
             for msg in print_list_blue[:-3]:
@@ -115,8 +123,6 @@ def roll_dice_auto(num_words):
             for msg in print_list_blue[-3:]:
                 print_blue(msg)
             return mnemonic
-
-
     
 def roll_dice_manual_binary(num_words):   
     mnemo = Mnemonic("english")

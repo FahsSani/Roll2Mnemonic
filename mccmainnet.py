@@ -109,30 +109,40 @@ def generate_mainnet_addresses(seed_phrase, num_child_keys, passphrase):
         TaprootWIFR = address_key_taprootR.WalletImportFormat()
         TaprootWIFC = address_key_taprootC.WalletImportFormat()
 
-        # Pubic addresses
+        # Public Keys
         setup("mainnet")
-        LegacyR = PrivateKey(LegacyWIFR).get_public_key().get_address().to_string()
-        LegacyC = PrivateKey(LegacyWIFC).get_public_key().get_address().to_string()
-        NestedR = generate_p2sh_p2wpkh_address(address_key_nestedR.PublicKey())  
-        NestedC = generate_p2sh_p2wpkh_address(address_key_nestedC.PublicKey())  
-        NativeR = PrivateKey(NativeWIFR).get_public_key().get_segwit_address().to_string()
-        NativeC = PrivateKey(NativeWIFC).get_public_key().get_segwit_address().to_string()
-        TaprootR = PrivateKey(TaprootWIFR).get_public_key().get_taproot_address().to_string()
-        TaprootC = PrivateKey(TaprootWIFC).get_public_key().get_taproot_address().to_string()
+        LegacyPKR = PrivateKey(LegacyWIFR).get_public_key().to_hex(compressed=True)
+        LegacyPKC = PrivateKey(LegacyWIFC).get_public_key().to_hex(compressed=True)
+        NestedPKR = binascii.hexlify(address_key_nestedR.PublicKey()).decode('utf-8')
+        NestedPKC = binascii.hexlify(address_key_nestedC.PublicKey()).decode('utf-8')
+        NativePKR = PrivateKey(NativeWIFR).get_public_key().to_hex(compressed=True)
+        NativePKC = PrivateKey(NativeWIFC).get_public_key().to_hex(compressed=True)
+        TaprootPKR = PrivateKey(TaprootWIFR).get_public_key().to_hex(compressed=True)
+        TaprootPKC = PrivateKey(TaprootWIFC).get_public_key().to_hex(compressed=True)
+
+        # Pubic addresses
+        LegacyAddR = PublicKey(LegacyPKR).get_address().to_string()
+        LegacyAddC = PublicKey(LegacyPKC).get_address().to_string()
+        NestedAddR = generate_p2sh_p2wpkh_address(address_key_nestedR.PublicKey())  
+        NestedAddC = generate_p2sh_p2wpkh_address(address_key_nestedC.PublicKey())  
+        NativeAddR = PublicKey(NativePKR).get_segwit_address().to_string()
+        NativeAddC = PublicKey(NativePKC).get_segwit_address().to_string()
+        TaprootAddR = PublicKey(TaprootPKR).get_taproot_address().to_string()
+        TaprootAddC = PublicKey(TaprootPKC).get_taproot_address().to_string()
 
         # Append keys, addresses & WIFs to addresses lists
-        addresses["Legacy (P2PKH)R"].append((xprv_root_key, legacy_acc_ext_xpub_key, "", "44", LegacyR, LegacyWIFR))
-        addresses["Legacy (P2PKH)C"].append(("44", LegacyC, LegacyWIFC))
-        addresses["Nested SegWit (P2SH-P2WPKH)R"].append((yprv_root_key, nested_acc_ext_xpub_key, nested_acc_ext_ypub_key, "49", NestedR, NestedWIFR))
-        addresses["Nested SegWit (P2SH-P2WPKH)C"].append(("49", NestedC, NestedWIFC))
-        addresses["Native SegWit (P2WPKH)R"].append((zprv_root_key, native_acc_ext_xpub_key, native_acc_ext_zpub_key, "84", NativeR, NativeWIFR))
-        addresses["Native SegWit (P2WPKH)C"].append(("84", NativeC, NativeWIFC))
-        addresses["Taproot (P2TR)R"].append((xprv_root_key, taproot_acc_ext_xpub_key, "", "86", TaprootR, TaprootWIFR))
-        addresses["Taproot (P2TR)C"].append(("86", TaprootC, TaprootWIFC))
+        addresses["Legacy (P2PKH)R"].append((xprv_root_key, legacy_acc_ext_xpub_key, "", "44", LegacyAddR, LegacyPKR, LegacyWIFR))
+        addresses["Legacy (P2PKH)C"].append(("44", LegacyAddC, LegacyPKC, LegacyWIFC))
+        addresses["Nested SegWit (P2SH-P2WPKH)R"].append((yprv_root_key, nested_acc_ext_xpub_key, nested_acc_ext_ypub_key, "49", NestedAddR, NestedPKR, NestedWIFR))
+        addresses["Nested SegWit (P2SH-P2WPKH)C"].append(("49", NestedAddC, NestedPKC, NestedWIFC))
+        addresses["Native SegWit (P2WPKH)R"].append((zprv_root_key, native_acc_ext_xpub_key, native_acc_ext_zpub_key, "84", NativeAddR, NativePKR, NativeWIFR))
+        addresses["Native SegWit (P2WPKH)C"].append(("84", NativeAddC, NativePKC, NativeWIFC))
+        addresses["Taproot (P2TR)R"].append((xprv_root_key, taproot_acc_ext_xpub_key, "", "86", TaprootAddR, TaprootPKR, TaprootWIFR))
+        addresses["Taproot (P2TR)C"].append(("86", TaprootAddC, TaprootPKC, TaprootWIFC))
 
     return addresses, bip39_root_key
 
-def print_address_details(script_type, addresses):
+def print_address_details(script_type, addresses, is_full):
     print()
     print()
     
@@ -151,75 +161,57 @@ def print_address_details(script_type, addresses):
         print_green(f"     Acc. Ext. Pub. Key: {extpubkey2}")
 
     format_info = {
-        "Legacy (P2PKH)": (38, 111),
-        "Nested SegWit (P2SH-P2WPKH)": (38, 111),
-        "Native SegWit (P2WPKH)": (46, 119),
-        "Taproot (P2TR)": (66, 139)
+        "Legacy (P2PKH)": (37, 111) if not is_full else (38, 182),
+        "Nested SegWit (P2SH-P2WPKH)": (37, 111) if not is_full else (38, 182),
+        "Native SegWit (P2WPKH)": (45, 119) if not is_full else (46, 190),
+        "Taproot (P2TR)": (65, 139) if not is_full else (66, 210)
     }
 
     if script_type in format_info:
-        address_width, line_width = format_info[script_type]
+        address_width, line_width = format_info[script_type]           
         header_template = f"         Derivation Path".ljust(28)
         address_template = "Bitcoin Address".ljust(address_width)
         wif_template = "Private Key / WIF (Wallet Import Format)"
+        pk_template = "Public Key".ljust(70) if is_full else ""
 
         print_purple("       Receive Addresses:")
-        print_cyan(f"{header_template} {address_template} {wif_template}")
+        print_cyan(f"{header_template} {address_template} {pk_template} {wif_template}")
         print_cyan(f"         " + "-" * line_width)
 
-        for index, (rootkey, extpubkey1, extpubkey2, BIP, address, wif) in enumerate(addresses[f'{script_type}R']):
+        for index, (rootkey, extpubkey1, extpubkey2, BIP, address, PK, wif) in enumerate(addresses[f'{script_type}R']):
             path = f" m/{BIP}'/0'/0'/0/{index}".ljust(20)
             address = address.ljust(address_width)
-            print(f"        {path} {address} {wif}")
+            pk = PK.ljust(70) if is_full else ""        
+            print(f"        {path} {address} {pk} {wif}")
 
         print()
         print_purple("       Change Addresses:")
-        print_cyan(f"{header_template} {address_template} {wif_template}")
+        print_cyan(f"{header_template} {address_template} {pk_template} {wif_template}")
         print_cyan(f"         " + "-" * line_width)
 
-        for index, (BIP, address, wif) in enumerate(addresses[f'{script_type}C']):
+        for index, (BIP, address, PK, wif) in enumerate(addresses[f'{script_type}C']):
             path = f" m/{BIP}'/0'/0'/1/{index}".ljust(20)
             address = address.ljust(address_width)
-            print(f"        {path} {address} {wif}")
+            pk = PK.ljust(70) if is_full else ""        
+            print(f"        {path} {address} {pk} {wif}")
 
 # Function to generate wallets
-def generate_mainnet_wallet(seed_phrase, num_child_keys, passphrase):
+def generate_mainnet_wallet(seed_phrase, num_child_keys, passphrase, list_type):
     if is_valid_seed(seed_phrase): #Recheck if the mnemonic seed phrase is valid
         seed = Mnemonic("english").to_seed(seed_phrase, passphrase=passphrase)
         hex_seed = binascii.hexlify(seed).decode('utf-8')
 
-        # Format Information box
-        creator_info = f"Created By          : Sani Fahs"
-        twitter_info = f"Twitter             : @SaniExp"
-        github_info = f"GitHub              : https://github.com/FahsSani"
-        lightning_info = f"Lightning Donations : sani@walletofsatoshi.com"
-        max_info_length = max(len(creator_info), len(twitter_info), len(github_info), len(lightning_info))
-        box_width = max_info_length + 4  # Adjust the box width based on the max info length
-        info_box = " " + "+" + "-" * (box_width - 2) + "+"
-        info_box += f"\n | {creator_info.ljust(max_info_length)} |"
-        info_box += f"\n | {twitter_info.ljust(max_info_length)} |"
-        info_box += f"\n | {github_info.ljust(max_info_length)} |"
-        info_box += f"\n | {lightning_info.ljust(max_info_length)} |"
-        info_box += "\n +" + "-" * (box_width - 2) + "+"
-
         addresses, bip39_root_key = generate_mainnet_addresses(seed_phrase, num_child_keys, passphrase=passphrase)
 
-        # Clear terminal
-        clear_terminal()
-
-        # Print title
-        text3 = "* ROLL   TO   MNEMONIC *"
-        print_centered_art_text(text3, 5, "Standard")
-
-        # Print data
-        print_bright_orange(info_box)
-        print()
-        print_red(" Mnemonic Seed Phrase:", seed_phrase)
-        print_red(" Passphrase          :", passphrase)
+        print_red(f"\n Mnemonic Seed Phrase: {seed_phrase}")
+        print_red(f" Passphrase          : {passphrase}")
         print_red(" BIP39 Seed Hex      :", hex_seed)
 
         for script_type in ["Legacy (P2PKH)", "Nested SegWit (P2SH-P2WPKH)", "Native SegWit (P2WPKH)", "Taproot (P2TR)"]:
-            print_address_details(script_type, addresses)
+            if list_type == "AddMain":
+                print_address_details(script_type, addresses, is_full=False)
+            else:
+                print_address_details(script_type, addresses, is_full=True)
 
         print()
         print_red(" To verify the mnemonic seed phrase, keys and addresses, visit: https://iancoleman.io/bip39/")
