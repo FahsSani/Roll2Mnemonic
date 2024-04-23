@@ -18,17 +18,18 @@ This multifaceted tool empowers you to effortlessly create secure mnemonic seed 
 
 ## Features
 
-- **Dice Roll To Mnemonic:**
+- **Dice Roll:**
     1. Physical Dice or Coin Toss: You have the flexibility to roll physical dice or conduct a coin toss and input the resulting data as either binary (1 or 0) or numbers (1 to 6). This method ensures absolute randomness for generating your mnemonic seed phrase.
     2. Dice Roll From Entropy: For a quicker approach, the program can generate random dice rolls for you. The automated dice roll function guarantees the essential randomness needed for a secure seed phrase.
     3. Mnemonic Seed Generation: After collecting the dice roll data, the program seamlessly proceeds to generate a valid checksum and creates a BIP39 mnemonic seed phrase. This seed phrase forms the cornerstone for generating Bitcoin private keys and public addresses.
     4. Mnemonic Code Converter: The generated mnemonic seed phrase is then processed through the Mnemonic Code Converter, capable of generating BIP39 private keys and public addresses for all script types: Legacy (P2PKH), Nested SegWit (P2SH-P2WPKH), Native SegWit (P2WPKH), and Taproot (P2TR).
-- **Seed To Mnemonic:**
+- **Mnemonic Converter:**
     1. Generate Hex Seed From Entropy: The program can generate a Hex seed from entropy. The automated function guarantees the essential randomness required for secure seed generation.
     2. Mnemonic Seed Generation: After collecting the Hex seed, the program seamlessly proceeds to generate a valid checksum and creates a BIP39 mnemonic seed phrase.
     3. Own Mnemonic Seed Phrase: You have the option to enter your own mnemonic seed phrase into the program.
     4. Mnemonic Code Converter: The generated mnemonic seed phrase is then processed through the Mnemonic Code Converter, capable of generating BIP39 private keys and public addresses for all script types: Legacy (P2PKH), Nested SegWit (P2SH-P2WPKH), Native SegWit (P2WPKH), and Taproot (P2TR).
-- **QR Code Generator:** A built in QR code generator from text.
+- **BIP85 Generator:** Generate BIP85 Child Keys from your own Mnemonic Seed Phrase or using seeds generated with the tools above, then specify the numbers of words and number of Child Keys using the index number.
+- **QR Code Generator:** A built-in QR code generator from text.
 
 
 ## Prerequisites
@@ -67,7 +68,7 @@ Follow these steps to use the Roll2Mnemonic:
 1. Clone or download this repository to your local machine.
 2. Ensure you have Python 3.11.x  or above installed.
 3. Install the necessary Python libraries listed in requirements.txt
-4. Launch start.py to initiate the code.
+4. Launch main.py to initiate the code.
 
 
 ## Offline Usage:
@@ -109,7 +110,7 @@ https://pip.pypa.io/en/stable/installation/
      pip download -r requirements.txt -d wheelhouse
      ```
 
-   d. Copy the Python and pip packages you downloaded earlier and the folder Roll2Mnemonic, which contains the repository and the subfolder Wheelhouse, into a USB stick and transfer them to your offline computer.
+   d. Copy the Python and pip packages you downloaded earlier and the folder Roll2Mnemonic, which contains the repository and the sub-folder Wheelhouse, into a USB stick and transfer them to your offline computer.
 
    e. Install the Python and pip packages then, in a terminal, navigate to the Roll2Mnemonic folder:
 

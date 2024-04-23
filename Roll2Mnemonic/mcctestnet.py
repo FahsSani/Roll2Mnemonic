@@ -1,4 +1,4 @@
-from common import *
+from Roll2Mnemonic.common import *
 
 # Function to generate P2SH-P2WPKH address
 def generate_p2sh_p2wpkh_address(public_key):
@@ -6,12 +6,12 @@ def generate_p2sh_p2wpkh_address(public_key):
     ripemd160.update(hashlib.sha256(public_key).digest())
     hashed_public_key = ripemd160.digest()
 
-    redeem_script = b"\x00\x14" + hashed_public_key  # OP_0 + 20-byte hashed public key
+    redeem_script = b"\x00\x14" + hashed_public_key  
     ripemd160_redeem_script = hashlib.new("ripemd160")
     ripemd160_redeem_script.update(hashlib.sha256(redeem_script).digest())
     hashed_redeem_script = ripemd160_redeem_script.digest()
 
-    version = b"\xc4"  # P2SH-P2WPKH address starts with '2' on testnet
+    version = b"\xc4"  
     payload = version + hashed_redeem_script
     checksum = hashlib.sha256(hashlib.sha256(payload).digest()).digest()[:4]
 
@@ -23,12 +23,12 @@ def decode_tprv_root_key(key):
     return decoded_key
 
 def encode_uprv_root_key(key_data):
-    uprv_prefix = bytes.fromhex("044a4e28")  # Change prefix to '044a4e28' for uprv
+    uprv_prefix = bytes.fromhex("044a4e28")  
     encoded_key = base58.b58encode_check(uprv_prefix + key_data)
     return encoded_key.decode()
 
 def encode_vprv_root_key(key_data):
-    vprv_prefix = bytes.fromhex("045f18bc")  # Change prefix to '045f18bc' for vprv
+    vprv_prefix = bytes.fromhex("045f18bc")  
     encoded_key = base58.b58encode_check(vprv_prefix + key_data)
     return encoded_key.decode()
 
@@ -37,26 +37,26 @@ def decode_tpub_ext_key(key):
     return decoded_key
 
 def encode_upub_ext_key(key_data):
-    upub_prefix = bytes.fromhex("044a5262")  # Change prefix to '044a5262' for upub
+    upub_prefix = bytes.fromhex("044a5262") 
     encoded_key = base58.b58encode_check(upub_prefix + key_data)
     return encoded_key.decode()
 
 def encode_vpub_ext_key(key_data):
-    vpub_prefix = bytes.fromhex("045f1cf6")  # Change prefix to '045f1cf6' for vpub
+    vpub_prefix = bytes.fromhex("045f1cf6")  
     encoded_key = base58.b58encode_check(vpub_prefix + key_data)
     return encoded_key.decode()
 
 # Function to generate Bitcoin testnet addresses
 def generate_testnet_addresses(seed_phrase, num_child_keys, passphrase):
     seed = Mnemonic("english").to_seed(seed_phrase, passphrase)
-    root_key = BIP32Key.fromEntropy(seed, testnet=True)  # Use testnet=True
+    root_key = BIP32Key.fromEntropy(seed, testnet=True)  
 
     # BIP32 Root Key
-    bip39_root_key = root_key.ExtendedKey()  # Legacy BIP32 Root Key
-    tprv_root_key = bip39_root_key  # Legacy BIP32 Root Key
+    bip39_root_key = root_key.ExtendedKey() 
+    tprv_root_key = bip39_root_key 
     decoded_key = decode_tprv_root_key(tprv_root_key)
-    uprv_root_key = encode_uprv_root_key(decoded_key[4:])  # Native BIP32 Root Key
-    vprv_root_key = encode_vprv_root_key(decoded_key[4:])  # Nested BIP32 Root Key
+    uprv_root_key = encode_uprv_root_key(decoded_key[4:])
+    vprv_root_key = encode_vprv_root_key(decoded_key[4:]) 
 
     account_legacy = root_key.ChildKey(44 + 2 ** 31).ChildKey(1 + 2 ** 31).ChildKey(0 + 2 ** 31)  
     account_nested = root_key.ChildKey(49 + 2 ** 31).ChildKey(1 + 2 ** 31).ChildKey(0 + 2 ** 31)  
@@ -197,7 +197,7 @@ def print_address_details(script_type, addresses, is_full):
 
 # Function to generate testnet wallets
 def generate_testnet_wallet(seed_phrase, num_child_keys, passphrase, list_type):
-    if is_valid_seed(seed_phrase): #Recheck if the mnemonic seed phrase is valid
+    if is_valid_seed(seed_phrase):
         seed = Mnemonic("english").to_seed(seed_phrase, passphrase=passphrase)
         hex_seed = binascii.hexlify(seed).decode('utf-8')
 
@@ -212,7 +212,7 @@ def generate_testnet_wallet(seed_phrase, num_child_keys, passphrase, list_type):
                 print_address_details(script_type, addresses, is_full=False)
             else:
                 print_address_details(script_type, addresses, is_full=True)
-
         print()
-        print_red(" To verify the mnemonic seed phrase, keys and addresses, visit: https://iancoleman.io/bip39/")
-        print()     
+        print()
+        print_red(" To verify the data above, visit: https://iancoleman.io/bip39/")
+        print()

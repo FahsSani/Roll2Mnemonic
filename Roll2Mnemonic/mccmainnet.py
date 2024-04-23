@@ -1,4 +1,4 @@
-from common import *
+from Roll2Mnemonic.common import *
 
 # Function to generate P2SH-P2WPKH address
 def generate_p2sh_p2wpkh_address(public_key):
@@ -6,12 +6,12 @@ def generate_p2sh_p2wpkh_address(public_key):
     ripemd160.update(hashlib.sha256(public_key).digest())
     hashed_public_key = ripemd160.digest()
 
-    redeem_script = b"\x00\x14" + hashed_public_key  # OP_0 + 20-byte hashed public key
+    redeem_script = b"\x00\x14" + hashed_public_key
     ripemd160_redeem_script = hashlib.new("ripemd160")
     ripemd160_redeem_script.update(hashlib.sha256(redeem_script).digest())
     hashed_redeem_script = ripemd160_redeem_script.digest()
 
-    version = b"\x05"  # P2SH-P2WPKH address starts with '3'
+    version = b"\x05"  
     payload = version + hashed_redeem_script
     checksum = hashlib.sha256(hashlib.sha256(payload).digest()).digest()[:4]
 
@@ -23,12 +23,12 @@ def decode_xprv_root_key(key):
     return decoded_key
 
 def encode_yprv_root_key(key_data):
-    yprv_prefix = bytes.fromhex("049d7878")  # Change prefix to '049d7878' for yprv
+    yprv_prefix = bytes.fromhex("049d7878")  
     encoded_key = base58.b58encode_check(yprv_prefix + key_data)
     return encoded_key.decode()
 
 def encode_zprv_root_key(key_data):
-    zprv_prefix = bytes.fromhex("04b2430c")  # Change prefix to '04b2430c' for zprv
+    zprv_prefix = bytes.fromhex("04b2430c")  
     encoded_key = base58.b58encode_check(zprv_prefix + key_data)
     return encoded_key.decode()
 
@@ -37,12 +37,12 @@ def decode_xpub_ext_key(key):
     return decoded_key
 
 def encode_ypub_ext_key(key_data):
-    ypub_prefix = bytes.fromhex("049d7cb2")  # Change prefix to '049d7cb2' for ypub
+    ypub_prefix = bytes.fromhex("049d7cb2")  
     encoded_key = base58.b58encode_check(ypub_prefix + key_data)
     return encoded_key.decode()
 
 def encode_zpub_ext_key(key_data):
-    zpub_prefix = bytes.fromhex("04b24746")  # Change prefix to '04b24746' for zpub
+    zpub_prefix = bytes.fromhex("04b24746") 
     encoded_key = base58.b58encode_check(zpub_prefix + key_data)
     return encoded_key.decode()
 
@@ -52,11 +52,11 @@ def generate_mainnet_addresses(seed_phrase, num_child_keys, passphrase):
     root_key = BIP32Key.fromEntropy(seed)
 
     # BIP32 Root Key
-    bip39_root_key = root_key.ExtendedKey()  # Legacy BIP32 Root Key
-    xprv_root_key = bip39_root_key  # Legacy BIP32 Root Key
+    bip39_root_key = root_key.ExtendedKey()  
+    xprv_root_key = bip39_root_key 
     decoded_key = decode_xprv_root_key(xprv_root_key)
-    yprv_root_key = encode_yprv_root_key(decoded_key[4:])  # Native BIP32 Root Key
-    zprv_root_key = encode_zprv_root_key(decoded_key[4:])  # Nested BIP32 Root Key
+    yprv_root_key = encode_yprv_root_key(decoded_key[4:]) 
+    zprv_root_key = encode_zprv_root_key(decoded_key[4:])  
 
     account_legacy = root_key.ChildKey(44 + 2 ** 31).ChildKey(0 + 2 ** 31).ChildKey(0 + 2 ** 31)
     account_nested = root_key.ChildKey(49 + 2 ** 31).ChildKey(0 + 2 ** 31).ChildKey(0 + 2 ** 31)
@@ -197,7 +197,7 @@ def print_address_details(script_type, addresses, is_full):
 
 # Function to generate wallets
 def generate_mainnet_wallet(seed_phrase, num_child_keys, passphrase, list_type):
-    if is_valid_seed(seed_phrase): #Recheck if the mnemonic seed phrase is valid
+    if is_valid_seed(seed_phrase): 
         seed = Mnemonic("english").to_seed(seed_phrase, passphrase=passphrase)
         hex_seed = binascii.hexlify(seed).decode('utf-8')
 
@@ -212,7 +212,7 @@ def generate_mainnet_wallet(seed_phrase, num_child_keys, passphrase, list_type):
                 print_address_details(script_type, addresses, is_full=False)
             else:
                 print_address_details(script_type, addresses, is_full=True)
-
         print()
-        print_red(" To verify the mnemonic seed phrase, keys and addresses, visit: https://iancoleman.io/bip39/")
+        print()
+        print_red(" To verify the data above, visit: https://iancoleman.io/bip39/")
         print()
