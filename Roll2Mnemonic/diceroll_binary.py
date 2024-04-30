@@ -81,7 +81,7 @@ def dr_binary(num_words):
         binary = binary
         decimal = int(binary, 2)
         decimal_formatted = f"{decimal:04d}"
-        index_num = str(decimal_value).zfill(4)
+        index_num = str(decimal+1).zfill(4)
         word = mnemo.wordlist[decimal]
         index = f"{index_num} - {word}"
 
